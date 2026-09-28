@@ -1,4 +1,34 @@
-# Open firmware for the HU-058D WiFi clock
+# Open firmware for the HU-058 WiFi clock using the ESP32-S3 Super Mini
+
+Wiring
+| ESP32-S3 | Socket pin | Net |
+| --- | --- | --- |
+| GPIO10 | 14 on HU-058D; 16 on HU-058 / HU-058SE | CLK, driver 1 |
+| GPIO7 | 5 | DATA, driver 1 |
+| GPIO4 | 1 | CLK_1, driver 2 |
+| GPIO5 | 2 | DATA_1, driver 2 |
+| GPIO1 | 9 | S1, top button |
+| GPIO2 | 10 | S2, bottom button |
+
+## Install via HAOS 
+
+When running HAOS inside Proxmox or another virtual machine, accessing files directly can be challenging. To resolve this, install the "Samba share" add-on by navigating to Settings / Apps within HAOS. Then access the folder "\\YOUR_HAOS_IP\config\esphome\” a file explorer.
+Ensure that you copy all required files into that folder, including the “components” folder.
+
+#  HU-058 USB-C Mod
+I strongly dislike Micro USB and prefer upgrading to USB-C whenever possible. It makes no sense why the designers chose Micro USB instead of USB-C, especially given that the price difference is negligible... maybe a couple of cents at most.
+
+Upgrading the jack to USB-C appears feasible, though it may demand finer soldering skills than many people feel comfortable with, including myself. To tackle this, I used a USB-C breakout board I had on hand, which fit conveniently between the case and the clocks PCB. I also used 32ga wire to make the connection from the usb board to the VCC and GND. A bit of hot glue holds the USB board securely in place.
+
+<img src="docs/images/usb-c.jpg" width="20%"><br />(https://www.aliexpress.us/item/3256808823260777.html)
+
+![PCB](docs/images/pcb.jpg)
+
+![Back of case with USB cut out](docs/images/case_back.jpg)
+I used a diamond cutting bit on a Dremel tool to create a hole for the usb connector on the back of the case.
+
+
+# Open firmware for the HU-058 WiFi clock
 
 The AliExpress kit sold as an "ESP8266 IoT Colorful WiFi Clock Kit" ships closed firmware which is lame and terrible. (And really hard to use.) I have reverse engineered the way to drive the display so you can use your own microcontroller. 
 
@@ -78,7 +108,7 @@ The display map came out of logic analyzer captures of the stock firmware.
 
 ## Firmware
 
-`firmware/esphome-wroom-32/` is the firmware that runs the clock. An ESPHome external
+`firmware/esphome/` is the firmware that runs the clock. An ESPHome external
 component for the two drivers, plus a config that puts the panel in Home
 Assistant:
 
@@ -92,7 +122,7 @@ Assistant:
 - A lamp test button that lights every populated LED white for three seconds,
   then returns to the time with the previous settings.
 
-`firmware/esp32-wroom-32/panel-test/` is a bare-metal PlatformIO project that drives
+`firmware/esp32/panel-test/` is a bare-metal PlatformIO project that drives
 the same panel with nothing but the Arduino core. It is the better starting
 point for a port, and its serial commands are the fastest way to find out
 which LED positions a given board actually has fitted.
